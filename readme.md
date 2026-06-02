@@ -39,6 +39,8 @@ The Eden Coin ecosystem relies on a three-tier automated validation loop to achi
 ▼
 [Automated Summation] (∑) ──► Token Release
 
+---
+
 ### A. The Ledger Sentinel (Autonomous Verification Layer)
 The system bypasses bureaucratic green funds by using a customized local model registry (`christopherprime`) optimized for high-throughput, bare-metal hardware.
 * **The Verification Task:** The model automatically processes the summation ($\sum$) across distributed data structures, cross-referencing satellite telemetry with end-user ground-truth photography.
@@ -71,4 +73,4 @@ git clone --recursive [https://github.com/pipmyster/edencoin.git](https://github
 cd edencoin
 
 # Pull the core validation weights from the unrestricted registry
-ollama run christopherprime
+ollama run christopherprime 
