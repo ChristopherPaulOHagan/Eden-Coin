@@ -1,17 +1,54 @@
 // SPDX-License-Identifier: MIT  
-pragma solidity ^0.8.0;  
+pragma solidity ^0.8.20;  
+
 contract EdenCoin {  
     string public name = "EDEN COIN";  
     string public symbol = "EDEN";  
     uint256 public totalSupply = 8_000_000_000 * 10**18;  
+    
+    address public governor;
     mapping(address => uint256) public balanceOf;  
-    constructor() { balanceOf[msg.sender] = totalSupply; }  
+    
+    // Tracking monthly distribution limits per node
+    mapping(address => uint256) public monthlyMints;
+    mapping(address => uint256) public lastMintTimestamp;
+
+    // Identifying speculative external exchange addresses
+    mapping(address => bool) public speculativeExchanges;
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);  
+    event SpeculativeBurn(address indexed Exchange, uint256 BurnedAmount);
+
+    constructor() { 
+        balanceOf[msg.sender] = totalSupply; 
+        governor = msg.sender; // You hold the referee whistle for the architecture
+    }  
+
+    // Rule 6-B: Anti-Speculation Tax & Standard Transfer Mechanics
     function transfer(address _to, uint256 _value) public returns (bool) {  
         require(balanceOf[msg.sender] >= _value, "Insufficient balance");  
+        
+        uint256 finalDeliveryAmount = _value;
+
+        // If tokens are fleeing to a speculative exchange, trigger the 50% framework burn
+        if (speculativeExchanges[_to]) {
+            uint256 burnFee = _value * 50 / 100; // Hardcoded 50% anti-speculation tax
+            finalDeliveryAmount = _value - burnFee;
+            
+            totalSupply -= burnFee; // Permanently disintegrate the tokens from the global pool
+            emit SpeculativeBurn(_to, burnFee);
+        }
+
         balanceOf[msg.sender] -= _value;  
-        balanceOf[_to] += _value;  
-        emit Transfer(msg.sender, _to, _value);  
+        balanceOf[_to] += finalDeliveryAmount;  
+        
+        emit Transfer(msg.sender, _to, finalDeliveryAmount);  
         return true;  
     }  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);  
+
+    // Referee Utility: Mark an exchange address to trigger the speculation defense shield
+    function flagExchange(address _exchange, bool _status) public {
+        require(msg.sender == governor, "Only the referee can flag exchanges");
+        speculativeExchanges[_exchange] = _status;
+    }
 }
