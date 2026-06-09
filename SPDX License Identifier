@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 contract EdenCoin {  
     string public name = "EDEN COIN";  
     string public symbol = "EDEN";  
-    uint256 public totalSupply = 1_000_000_000 * 10**18;  
+    uint256 public totalSupply = 8_000_000_000 * 10**18;  
     mapping(address => uint256) public balanceOf;  
     constructor() { balanceOf[msg.sender] = totalSupply; }  
     function transfer(address _to, uint256 _value) public returns (bool) {  
