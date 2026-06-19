@@ -1,41 +1,54 @@
 // SPDX-License-Identifier: MIT  
 pragma solidity ^0.8.20;  
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
+
 contract EdenCoin {  
-    string public name = "EDEN COIN";  
-    string public symbol = "EDEN";  
+    using Strings for uint256;
+
+    // 1. Global Core Variables
+    string public constant name = "EDEN COIN";  
+    string public constant symbol = "EDEN";  
     uint256 public totalSupply = 8_000_000_000 * 10**18;  
-    
     address public governor;
+
+    // 2. Ledger Mapping Registries
     mapping(address => uint256) public balanceOf;  
-    
-    // Tracking monthly distribution limits per node
     mapping(address => uint256) public monthlyMints;
     mapping(address => uint256) public lastMintTimestamp;
-
-    // Identifying speculative external exchange addresses
     mapping(address => bool) public speculativeExchanges;
 
+    // 3. Note/NFT Serialization Trackers
+    uint256 public coinCounter;
+    mapping(uint256 => address) public coinOwners;
+
+    // 4. Hardcoded Microcode Matrix
+    string private constant UNYIELDING_MICROCODE = "<Always remains the property of Eden Coin and the Owner is willing to prosecute(IN microcode)>";
+
+    // 5. System Event Logs
     event Transfer(address indexed _from, address indexed _to, uint256 _value);  
     event SpeculativeBurn(address indexed Exchange, uint256 BurnedAmount);
+    event NoteIssued(uint256 indexed NoteID, address indexed Recipient);
 
+    // 6. Architecture Constructor
     constructor() { 
         balanceOf[msg.sender] = totalSupply; 
-        governor = msg.sender; // You hold the referee whistle for the architecture
+        governor = msg.sender; 
     }  
 
-    // Rule 6-B: Anti-Speculation Tax & Standard Transfer Mechanics
+    // 7. Core Transaction Engine (Rule 6-B: Anti-Speculation Fee)
     function transfer(address _to, uint256 _value) public returns (bool) {  
         require(balanceOf[msg.sender] >= _value, "Insufficient balance");  
         
         uint256 finalDeliveryAmount = _value;
 
-        // If tokens are fleeing to a speculative exchange, trigger the 50% framework burn
+        // If tokens escape to a flagged exchange, trigger the 50% system burn
         if (speculativeExchanges[_to]) {
-            uint256 burnFee = _value * 50 / 100; // Hardcoded 50% anti-speculation tax
+            uint256 burnFee = (_value * 50) / 100; 
             finalDeliveryAmount = _value - burnFee;
             
-            totalSupply -= burnFee; // Permanently disintegrate the tokens from the global pool
+            totalSupply -= burnFee; 
             emit SpeculativeBurn(_to, burnFee);
         }
 
@@ -46,7 +59,38 @@ contract EdenCoin {
         return true;  
     }  
 
-    // Referee Utility: Mark an exchange address to trigger the speculation defense shield
+    // 8. On-Chain Note Generator (Microcode Text Display)
+    function generateNoteText(uint256 _noteId) public pure returns (string memory) {
+        return string(abi.encodePacked(
+            "............................\n",
+            "....\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91.....\n",
+            ".....\xE2\x88\x91...........\xE2\x88\x91......\n",
+            "......\xE2\x88\x91\xE2\x88\x91................\n",
+            ".....\xE2\x88\x91...........\xE2\x88\x91......\n",
+            "....\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91......\n",
+            UNYIELDING_MICROCODE, "\n",
+            "....\xE2\x88\x91", _noteId.toString(), "....\n",
+            "................................\n"
+        ));
+    }
+
+    // 9. Wallet Metadata Exposer
+    function tokenURI(uint256 _noteId) public view returns (string memory) {
+        require(coinOwners[_noteId] != address(0), "Note does not exist");
+        
+        string memory rawText = generateNoteText(_noteId);
+        
+        string memory json = string(abi.encodePacked(
+            '{"name": "Eden Note #', _noteId.toString(), '", ',
+            '"description": "Verifiable Planetary Restoration Instrument", ',
+            '"attributes": [{"trait_type": "Legal Matrix", "value": "Prosecution Protection Enabled"}], ',
+            '"raw_layout": "', rawText, '"}'
+        ));
+
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(json))));
+    }
+
+    // 10. Referee Administrative Interface
     function flagExchange(address _exchange, bool _status) public {
         require(msg.sender == governor, "Only the referee can flag exchanges");
         speculativeExchanges[_exchange] = _status;
