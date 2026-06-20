@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: MIT  
+pragma solidity ^0.8.20;  
+
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
+
+contract EdenMaladyCoin {  
+    using Strings for uint256;
+
+    // 1. Global Core Variables
+    string public constant name = "EDEN MALADY COIN";  
+    string public constant symbol = "EDNM";  
+    uint256 public totalSupply = 8_000_000_000 * 10**18;  
+    address public governor;
+
+    // 2. Specialized Redirection Vaults
+    address public waterRedirectionVault;
+    address public godDogCoinVault;
+
+    // 3. Ledger Mapping Registries & Stagnation Clocks
+    mapping(address => uint256) public balanceOf;  
+    mapping(address => uint256) public lastTransferTimestamp;
+    mapping(address => bool) public speculativeExchanges;
+
+    // 4. Note Serialization Trackers
+    uint256 public coinCounter;
+    mapping(uint256 => address) public coinOwners;
+
+    // 5. Hardcoded Microcode Matrix
+    string private constant UNYIELDING_MICROCODE = "<Always remains the property of Eden Coin and the Owner is willing to prosecute(IN microcode)>";
+
+    // 6. System Event Logs
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);  
+    event SpeculativeBurn(address indexed Exchange, uint256 BurnedAmount);
+    event MaladyRedirection(address indexed StagnantHolder, uint256 TotalRedirected, uint256 SplitAmount);
+
+    // 7. Architecture Constructor
+    constructor(address _waterVault, address _godDogVault) { 
+        balanceOf[msg.sender] = totalSupply; 
+        governor = msg.sender; 
+        
+        // Locking in the destination endpoints for stagnation recycling
+        waterRedirectionVault = _waterVault;
+        godDogCoinVault = _godDogVault;
+        
+        // Initialize the deployer's clock
+        lastTransferTimestamp[msg.sender] = block.timestamp;
+    }  
+
+    // 8. Core Transaction Engine with Stagnation Update Rules
+    function transfer(address _to, uint256 _value) public returns (bool) {  
+        require(balanceOf[msg.sender] >= _value, "Insufficient balance");  
+        
+        // Safety Check: Prevent transferring from an already expired/stagnant account
+        if (block.timestamp - lastTransferTimestamp[msg.sender] >= 5 * 365 days) {
+            _enforceStagnation(msg.sender);
+            return false;
+        }
+
+        uint256 finalDeliveryAmount = _value;
+
+        // Rule 6-B: Anti-Speculation Fee
+        if (speculativeExchanges[_to]) {
+            uint256 burnFee = (_value * 50) / 100; 
+            finalDeliveryAmount = _value - burnFee;
+            
+            totalSupply -= burnFee; 
+            emit SpeculativeBurn(_to, burnFee);
+        }
+
+        // Execute balancing math
+        balanceOf[msg.sender] -= _value;  
+        balanceOf[_to] += finalDeliveryAmount;  
+        
+        // Reset the velocity clocks for both parties to prevent starvation burn
+        lastTransferTimestamp[msg.sender] = block.timestamp;
+        lastTransferTimestamp[_to] = block.timestamp;
+        
+        emit Transfer(msg.sender, _to, finalDeliveryAmount);  
+        return true;  
+    }  
+
+    // 9. The Malady Protocol Engine (The 5-Year Stagnation Burn Loop)
+    function enforceStagnationOnAccount(address _holder) public returns (bool) {
+        require(block.timestamp - lastTransferTimestamp[_holder] >= 5 * 365 days, "Account is still active within velocity parameter");
+        _enforceStagnation(_holder);
+        return true;
+    }
+
+    // Low-level internal execution logic for the 50/50 vault split
+    function _enforceStagnation(address _holder) internal {
+        uint256 stagnantBalance = balanceOf[_holder];
+        if (stagnantBalance > 0) {
+            uint256 splitAmount = stagnantBalance / 2;
+
+            balanceOf[_holder] = 0;
+            balanceOf[waterRedirectionVault] += splitAmount;
+            balanceOf[godDogCoinVault] += splitAmount;
+
+            // Update timestamp so it doesn't trigger repeatedly on an empty balance
+            lastTransferTimestamp[_holder] = block.timestamp;
+
+            emit MaladyRedirection(_holder, stagnantBalance, splitAmount);
+        }
+    }
+
+    // 10. Microcode Banknote Representation Text Engine
+    function generateNoteText(uint256 _noteId) public pure returns (string memory) {
+        return string(abi.encodePacked(
+            "............................\n",
+            "....\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91.....\n",
+            ".....\xE2\x88\x91...........\xE2\x88\x91......\n",
+            "......\xE2\x88\x91\xE2\x88\x91................\n",
+            ".....\xE2\x88\x91...........\xE2\x88\x91......\n",
+            "....\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91......\n",
+            UNYIELDING_MICROCODE, "\n",
+            "....\xE2\x88\x91", _noteId.toString(), "....\n",
+            "................................\n"
+        ));
+    }
+
+    function tokenURI(uint256 _noteId) public view returns (string memory) {
+        require(coinOwners[_noteId] != address(0), "Note does not exist");
+        string memory rawText = generateNoteText(_noteId);
+        string memory json = string(abi.encodePacked(
+            '{"name": "Eden Malady Note #', _noteId.toString(), '", ',
+            '"description": "Stagnation Protected Planetary Asset", ',
+            '"raw_layout": "', rawText, '"}'
+        ));
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(json))));
+    }
+
+    // 11. Administrative Maintenance Switches
+    function flagExchange(address _exchange, bool _status) public {
+        require(msg.sender == governor, "Only the referee can flag exchanges");
+        speculativeExchanges[_exchange] = _status;
+    }
+
+    function updateVaultAddresses(address _newWaterVault, address _newGodDogVault) public {
+        require(msg.sender == governor, "Only the referee can update target parameters");
+        waterRedirectionVault = _newWaterVault;
+        godDogCoinVault = _newGodDogVault;
+    }
+}
