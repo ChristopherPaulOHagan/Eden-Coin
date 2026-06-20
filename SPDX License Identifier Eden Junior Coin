@@ -1,0 +1,113 @@
+// SPDX-License-Identifier: MIT  
+pragma solidity ^0.8.20;  
+
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
+
+contract EdenJuniorCoin {  
+    using Strings for uint256;
+
+    // 1. Global Core Variables
+    string public constant name = "EDEN JUNIOR COIN";  
+    string public constant symbol = "EDNJ";  
+    uint256 public totalSupply; // Supply grows dynamically as kids plant and cultivate
+    address public globalGovernor;
+
+    // 2. School & Teacher Registry Access Control
+    mapping(address => bool) public verifiedSchools;
+    mapping(address => address) public teacherToSchool; // Links a teacher's wallet to their school node
+
+    // 3. Student Ledger Accounts & Progress Tracking
+    mapping(address => uint256) public balanceOf;  
+    mapping(address => uint256) public totalMilestonesAchieved; // Tracks how many veggie patches/trees planted
+
+    // 4. Junior Banknote / Badge Trackers
+    uint256 public badgeCounter;
+    mapping(uint256 => address) public badgeOwners;
+    mapping(uint256 => string) public badgeMilestoneType; // e.g., "School Veggie Patch", "Horticulture Transformation"
+
+    // 5. System Event Logs
+    event SchoolApproved(address indexed SchoolAddress);
+    event TeacherApproved(address indexed TeacherAddress, address indexed School);
+    event JuniorMilestoneMinted(address indexed Student, uint256 Amount, string MilestoneType);
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);  
+
+    // 6. Architecture Constructor
+    constructor() { 
+        globalGovernor = msg.sender; 
+    }  
+
+    // 7. Safety-Locked Transaction Engine
+    // Keeps children safe by preventing external wallets from draining or buying their tokens
+    function transfer(address _to, uint256 _value) public returns (bool) {  
+        require(balanceOf[msg.sender] >= _value, "Insufficient balance");  
+        
+        balanceOf[msg.sender] -= _value;  
+        balanceOf[_to] += _value;  
+        
+        emit Transfer(msg.sender, _to, _value);  
+        return true;  
+    }  
+
+    // 8. The Education Minting Engine (The Vege Garden Protocol)
+    // Allows verified teachers to reward students directly for real-world labor
+    function rewardStudent(address _student, uint256 _milestones, string memory _type) public {
+        address school = teacherToSchool[msg.sender];
+        require(school != address(0) || verifiedSchools[msg.sender], "Only verified teachers or schools can reward milestones");
+        require(_milestones <= 5, "Daily milestone cap exceeded for junior safety");
+
+        uint256 tokenReward = _milestones * 10 * 10**18; // 10 EDNJ per verified milestone (e.g., weeding, planting, watering)
+        
+        balanceOf[_student] += tokenReward;
+        totalSupply += tokenReward;
+        totalMilestonesAchieved[_student] += _milestones;
+
+        // Issue a serialized visual badge directly to the student's on-chain profile
+        badgeCounter++;
+        badgeOwners[badgeCounter] = _student;
+        badgeMilestoneType[badgeCounter] = _type;
+
+        emit JuniorMilestoneMinted(_student, tokenReward, _type);
+    }
+
+    // 9. Microcode Junior Certificate Text Engine
+    // Instead of raw data, kids see a digital certificate showing their exact milestone achievement
+    function generateBadgeText(uint256 _badgeId) public view returns (string memory) {
+        return string(abi.encodePacked(
+            "..........................................\n",
+            "....\xE2\x88\x91\xE2\x88\x91\xE2\x88\x91 JUNIOR GREEN THUMB CERTIFICATE \xE2\x88\x91\xE2\x88\x91\xE2\x88\x91....\n",
+            "..........................................\n",
+            "   Badge Serial ID: #", _badgeId.toString(), "\n",
+            "   Project: ", badgeMilestoneType[_badgeId], "\n",
+            "   Status: Verifiable Earth Custodian\n",
+            "..........................................\n",
+            " <Property of the Eden Junior Restoration Program>\n",
+            "..........................................\n"
+        ));
+    }
+
+    function tokenURI(uint256 _badgeId) public view returns (string memory) {
+        require(badgeOwners[_badgeId] != address(0), "Certificate does not exist");
+        string memory rawText = generateBadgeText(_badgeId);
+        string memory json = string(abi.encodePacked(
+            '{"name": "Eden Junior Badge #', _badgeId.toString(), '", ',
+            '"description": "Verifiable School Horticulture Achievement", ',
+            '"raw_layout": "', rawText, '"}'
+        ));
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(json))));
+    }
+
+    // 10. School Node Governance Switches (The Administrative Layer)
+    function registerSchool(address _school) public {
+        require(msg.sender == globalGovernor, "Only the global referee can register a school node");
+        verifiedSchools[_school] = true;
+        emit SchoolApproved(_school);
+    }
+
+    function registerTeacher(address _teacher, address _school) public {
+        require(msg.sender == globalGovernor || verifiedSchools[msg.sender], "Unauthorized to register teachers");
+        require(verifiedSchools[_school], "Target school must be registered first");
+        teacherToSchool[_teacher] = _school;
+        emit TeacherApproved(_teacher, _school);
+    }
+}
