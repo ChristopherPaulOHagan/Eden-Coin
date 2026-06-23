@@ -2,7 +2,6 @@
 
 To ensure absolute traceability and real-time lifecycle tracking without external server dependencies, each minted token is securely bound to a fixed-width, 42-character alphanumeric graphic matrix rendered natively from bytecode:
 
-{
 ==========================================
 ================Eden=Coin=================
 ==========================================
@@ -28,4 +27,3 @@ To ensure absolute traceability and real-time lifecycle tracking without externa
 ===Always=remains=property=of=EdenCoin====
 ==========================================
 ==========================================
-}
