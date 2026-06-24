@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark theme -->
+    <style name="Theme.TreeTracker" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="colorPrimary">#2c3e50</item>
+        <item name="colorPrimaryDark">#2c3e50</item>
+        <item name="colorAccent">#2ecc71</item>
+        <item name="windowBackground">@android:color/black</item>
+        <item name="textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!-- Basic styles -->
+    <style name="GreenButton" parent="Widget.Button">
+         <item name="android:background">#2ecc71</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+</resources>
