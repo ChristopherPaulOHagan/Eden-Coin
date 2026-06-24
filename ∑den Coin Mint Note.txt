@@ -1,6 +1,6 @@
 # The On-Chain Banknote Representation
 
-To ensure absolute traceability and real-time lifecycle tracking without external server dependencies, each minted token is securely bound to a fixed-width, 42-character alphanumeric graphic matrix rendered natively from bytecode:
+To ensure absolute traceability and real-time lifecycle tracking without external server dependencies, each minted token is securely bound to a fixed-width, 42-character alphanumeric graphic matrix rendered natively from bytecode and all three security tags have an ∑tag for tracking and mint date:
 
 ## PIC_1 is Eden Coin in Morse Code in the noise surrounding sigma.
 
