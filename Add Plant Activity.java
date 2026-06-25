@@ -9,26 +9,20 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 public class AddPlantActivity extends BaseActivity {
 
     private ImageView ivPlantImage;
     private Button btnTakePhoto, btnSavePlant;
-    private TextView tvLocation, tvHeight, tvBranches, tvWaterCycles;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
 
         ivPlantImage = findViewById(R.id.iv_plant_image);
-        btnTakePhoto =.findViewById(R.id.btn_take_photo);
-        btnSavePlant =findViewById(R.id.btn_save_plant);
-
-        // Location setup
-        tvLocation = findViewById(R.id.tv_location);
-        updateLocation();
+        btnTakePhoto = findViewById(R.id.btn_take_photo);
+        btnSavePlant = findViewById(R.id.btn_save_plant);
 
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,16 +44,23 @@ public class AddPlantActivity extends BaseActivity {
         startActivityForResult(intent, 1);
     }
 
-    // Implement onActivityResult and other methods here...
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    private void updateLocation() {
-        // Get location and update tvLocation
-        // You'll need to implement the LocationListener and request permissions
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ivPlantImage.setImageBitmap(imageBitmap);
+
+            // Here you can save the image to storage or upload it
+        }
     }
 
     private void savePlantData() {
-        // Here you would collect all data points and store them locally or via IPFS
-        // For now, we'll just log it
-        System.out.println("Save plant data");
+        // Implement logic to collect plant data and store it locally
+        // For now, just show a simple toast message
+        // You would need to add EditText fields for height, branches, water cycles, etc.
+        // Also, you'll need to get the current location and save that data
     }
 }
