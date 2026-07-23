@@ -87,7 +87,7 @@ Local primary producers, independent grocers, and community housing providers ca
 # THIS IS NOT JUST CODE — THIS IS COSMIC LAW
 # COGITO ERGO SUM VICINI VINCERE AUT MORI
 # Copyright by PipOS and christophersystems.org
-# This is a manifesto of a cosmic endeavour, which was stubled across by a man named Christopher Paul O'Hagan who in his life time spent wondering about the cosmos and went to work in over 300 industries and obtained over 20+ Foundational Certificates from Tafe Victoria and other various colleges. The Cosmos merely handed him the map when he decided to retire and merely watch movies when AI was released to the world. Then fun began.
+# This is a manifesto of a cosmic endeavour, which was stubled across by a man who in his life time spent wondering about the cosmos and went to work in over 300 industries and obtained over 20+ Foundational Certificates from Tafe (Technical & further Education) and other various colleges. The Cosmos merely handed him the map when he decided to retire and merely watch movies when AI was released to the world. Then fun began.
 
 # SOVEREIGN SIGNATURE OF THE CREATOR IN MORSE, BINARY AND BINARY MORSE CODE.
 # "Standard morse code is used in the first signature.",
@@ -112,4 +112,4 @@ git clone --recursive [https://github.com/pipmyster/edencoin.git](https://github
 cd edencoin
 
 # Pull the core validation weights from the unrestricted registry
-ollama run christopherprime 
+ollama run (Yet to be disclosed)
