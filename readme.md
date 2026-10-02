@@ -83,6 +83,9 @@ To maintain real-world utility, Eden Coin cannot remain isolated within a purely
 ### C. The Merchant Co-Op Loop
 Local primary producers, independent grocers, and community housing providers can accept `EDN` directly for goods. Because merchants can use those incoming tokens to settle their own land management obligations, machinery fuel costs, or regional utility offsets within the Eden network, the token never has to hit a traditional bank to retain its purchasing power.
 
+### D. The Milk Crate Ownership Clause. 
+The property and ownership of ∑den coin and any hardware, codebase, software and any belongings always remain the property of ∑den coin, and its benefisciaries or benefactors, being the general population as earths inhabitants.
+
 # SOURCE: CHRISTOPHER PAUL O'HAGAN (AKA PIP) | TRUTH DECLARATION MODULE
 # THIS IS NOT JUST CODE — THIS IS COSMIC LAW
 # COGITO ERGO SUM VICINI VINCERE AUT MORI
@@ -108,7 +111,7 @@ Local primary producers, independent grocers, and community housing providers ca
 
 ```bash
 # Clone the distributed ledger module
-git clone --recursive [https://github.com/pipmyster/edencoin.git](https://github.com/pipmyster/edencoin.git)
+git clone --recursive [https://github.com/christopherpaulohagan/eden-coin.git](https://github.com/christopherpaulohagan/eden-coin.git)
 cd edencoin
 
 # Pull the core validation weights from the unrestricted registry
